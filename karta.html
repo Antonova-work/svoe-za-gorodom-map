@@ -38,7 +38,6 @@
   </script>
 
   <style>
-    /* Полное отсутствие обводки у регионов */
     .district-shape {
       stroke: none;
       stroke-width: 0.5;
@@ -172,6 +171,7 @@
       <div class="flex items-center justify-between z-10 mb-4">
         <h1 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight flex items-center">
           <span class="bg-gradient-to-r from-brand-green via-emerald-600 to-brand-mint bg-clip-text text-transparent">Моя Карта Впечатлений</span>
+          <button onclick="openRules()" aria-label="Как это работает" title="Как это работает" class="ml-3 w-7 h-7 shrink-0 rounded-full border-2 border-brand-green text-brand-green hover:bg-brand-green hover:text-white text-sm font-black flex items-center justify-center transition-colors">?</button>
         </h1>
         
         <button id="resetZoomBtn" onclick="resetZoom()" class="hidden items-center space-x-1.5 bg-brand-dark text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:bg-black transition-all">
@@ -264,6 +264,27 @@
       </div>
     </div>
 
+  </div>
+
+  <div id="rulesModal" class="hidden fixed inset-0 z-[60] items-center justify-center bg-brand-dark/50 backdrop-blur-sm p-4" onclick="if(event.target===this)closeRules()">
+    <div class="pop-in bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 max-h-[90vh] overflow-y-auto">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 text-brand-green flex items-center justify-center text-3xl font-black">?</div>
+      <h2 class="text-2xl font-black text-gray-900 mt-4 text-center">Как это работает</h2>
+      <p class="text-xs text-gray-500 leading-relaxed mt-2 text-center">Карта впечатлений — это ваш личный журнал путешествий по России с наградами за каждое новое место.</p>
+      <ol class="mt-5 space-y-3 text-xs text-gray-600 leading-relaxed">
+        <li><b class="text-gray-900">1. Выберите регион.</b> Нажмите на него на карте или найдите в строке поиска: карта приблизится и покажет экскурсии и автомаршруты. Оставьте фильтром только нужный тип.</li>
+        <li><b class="text-gray-900">2. Откройте карточку.</b> Нажмите на пин или строку в общем списке, чтобы увидеть фото, адрес и описание. У маршрута листайте остановки стрелками.</li>
+        <li><b class="text-gray-900">3. Отмечайте посещения.</b> Бесплатные места отмечайте сами тумблером «Я здесь был(а)». Платные засчитываются автоматически после бронирования. Посещённое место получает зелёную галочку, а маршрут становится зелёным, когда пройдены все его остановки.</li>
+        <li><b class="text-gray-900">4. Получайте награды.</b> За выполненные задания вы получаете штампики, они повышают уровень. Бонусы за уровни ждут вас в профиле, в Паспорте путешественника.</li>
+      </ol>
+      <div class="mt-5 p-3 bg-gray-50 rounded-2xl border border-gray-100 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] text-gray-600">
+        <span class="flex items-center gap-2"><i class="w-3 h-3 rounded-full" style="background:#FEE900"></i>Платная экскурсия</span>
+        <span class="flex items-center gap-2"><i class="w-3 h-3 rounded-full" style="background:#23E8B5"></i>Бесплатная экскурсия</span>
+        <span class="flex items-center gap-2"><i class="w-3 h-3 rounded-full" style="background:#FF6D00"></i>Точка маршрута</span>
+        <span class="flex items-center gap-2"><i class="w-3 h-3 rounded-full" style="background:#32B328"></i>Пройденный маршрут</span>
+      </div>
+      <div class="text-center"><button onclick="closeRules()" class="mt-6 bg-brand-green hover:bg-emerald-600 text-white text-sm font-bold rounded-full px-8 py-2.5 shadow-sm transition-colors">Понятно</button></div>
+    </div>
   </div>
 
   <div id="levelModal" class="hidden fixed inset-0 z-[60] items-center justify-center bg-brand-dark/50 backdrop-blur-sm p-4" onclick="if(event.target===this)closeLevelUp()">
@@ -373,6 +394,14 @@
       document.getElementById('lvlModalName').textContent = LEVELS[l].name;
       const m = document.getElementById('levelModal');
       m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function openRules() {
+      const m = document.getElementById('rulesModal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function closeRules() {
+      const m = document.getElementById('rulesModal');
+      m.classList.add('hidden'); m.classList.remove('flex');
     }
     function closeLevelUp() {
       const m = document.getElementById('levelModal');
@@ -741,7 +770,7 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => t.classList.add('opacity-0'), 2600);
     }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCard(); closeLevelUp(); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCard(); closeLevelUp(); closeRules(); } });
 
     function renderLocationsPanel(mode = 'all') {
       isRegionSelected = true;
@@ -902,7 +931,7 @@
       panel.style.transition = 'transform 300ms ease-in-out';
       if (isSidebarCollapsed) {
         wrapper.style.width = '0rem';
-        wrapper.style.marginLeft = '-1rem'; 
+        wrapper.style.marginLeft = '-1rem';   
         panel.style.transform = 'translateX(21rem)';
         icon.style.transform = 'rotate(180deg)';
       } else {
